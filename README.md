@@ -1,4 +1,4 @@
 # Acoustic tools
  
-Basic tools to process acoustic signals in Matlab and Python versions. 
+Basic tools to process audio signals in Matlab and Python. 
 
