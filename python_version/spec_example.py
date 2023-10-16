@@ -8,23 +8,30 @@ from scipy.signal import chirp
 from scipy.io import savemat
 import matplotlib.pyplot as plt
 import tools.spectogram_gen as spectrogram
-
+import scipy.io.wavfile as wav
 
 def main():
-    fs = 10000 # in Hz, sampling frequency 
-    duration=60 # Duration in seconds 
-    N = fs * duration # Number of samples
-    t = np.arange(0,N+1)/fs
-    ## Example 
-    # Generate a linear frequency modulated signal from 100 to 2000 Hz with a duration of 50 seconds
-    x = chirp(t, f0=100, f1=2000, t1=50, method='linear') 
-    noise = np.random.normal(0, 0.2, x.shape) 
-    x += noise # Add some random noise
-    
-    ### Add a tone
-    tone_freq=3500.0 # in Hz
-    x2 = np.sin(2 * np.pi * tone_freq*t)
-    x +=x2
+    read_audio=False # True to read in a wav file or False to generate a sample signal
+    if read_audio:
+        fs, x = wav.read("chirp_example.wav")
+        t = np.arange(0,len(x))/fs
+    else:
+        fs = 8000 # in Hz, sampling frequency 
+        duration=10 # Duration in seconds 
+        N = fs * duration # Number of samples
+        t = np.arange(0,N+1)/fs
+        
+        ## Example 
+        # Generate a linear frequency modulated signal from 100 to 2000 Hz with a duration of 50 seconds
+        x = chirp(t, f0=100, f1=2000, t1=10, method='linear') 
+        noise = np.random.normal(0, 0.2, x.shape) 
+        x += noise # Add some random noise
+        
+        ### Add a tone
+        tone_freq=3500.0 # in Hz
+        x2 = np.sin(2 * np.pi * tone_freq*t)
+        x +=x2
+        x = x/(np.max(np.abs(x))*1.001)
     # Calculate spectrogram
     nfft = 2**12 # number of samples for each FFT (2^12=4096). df=fs/nfft 
     tWindow = 0.1 #  Integration time in seconds, ideally it is nfft/fs
@@ -58,13 +65,16 @@ def main():
     plt.xlabel("Frequency (Hz)")
     plt.ylabel("Time (sec)")
     plt.title('Spectrogram')
-    plt.savefig(folder_name+file_root+'_spec.png')
-    plt.show()        
+    plt.savefig(folder_name+file_root+'_spec.png')            
 
     # Example for saving a dictionary as a .mat file using scipy
     mdic={'spec_py':spec,'f_py':F,'t_py':T,'overlap':NOverlap,'x_py':x,'NFFT_py':nfft,'fs':fs}
-    savemat('Test_spectrogram.mat',mdic)
+    savemat('Test_spectrogram.mat',mdic)    
+    # Save audiofile
+    filename = "chirp_example.wav"
+    wav.write(filename, fs, x)
     
+    plt.show()
 if __name__ == "__main__":
     main()
     
