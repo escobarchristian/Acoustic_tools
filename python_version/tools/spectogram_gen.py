@@ -2,7 +2,6 @@
 """
 import numpy as np
 
-
 def spectrogram_PSD_matlab(x,window,noverlap,nfft,fs):
     """
     This function uses the same Matlab implementation to return the power spectral density from the time series x
@@ -22,8 +21,6 @@ def spectrogram_PSD_matlab(x,window,noverlap,nfft,fs):
         f : ndarray of float
             Frequency array            
     """
-
-
     x = np.squeeze(x.astype(np.float32)) # Format the input time series
     W = np.mean(np.multiply(window, window)) # normalizing factor
     nx=len(window) # Window size
@@ -44,8 +41,7 @@ def spectrogram_PSD_matlab(x,window,noverlap,nfft,fs):
     nf = len(f)
 
     P = np.zeros([nt,nf])
-    nstart=0
-    
+    nstart=0   
 
     for time_idx in np.arange(nt):
         # beginning at index nstart sample, do the FFT on a signal ns samples in length
@@ -62,22 +58,13 @@ def spectrogram_PSD_matlab(x,window,noverlap,nfft,fs):
                 if new_size>nx:
                     x1[nx:]=0
                 x1=x1.reshape(n_aux,nfft)
-                x1=np.sum(x1,0)
-                
-            # calculate the fft for a single change and the time_idx time sample
-            # and extract the single sided part
-            Xss = np.fft.fft(x1, nfft)[:int(nfft/2)+1]
-            # If x contains multiple channels, use this with x1 dimensions channel x time 
-            #   Xss = np.fft.fft(x1, ns, axis=1)[:, :int(ns/2)]
-
-            # create scale value
+                x1=np.sum(x1,0)                
+            # calculate the fft and obtain the single sided part
+            Y = np.fft.fft(x1, nfft)[:int(nfft/2)+1]
+            # Scale the signal based on the normalizing factor 
             Scale = (2/nfft/fs/W)/(nx/nfft)
-
-            # multiply by our scale value and force the dtype back to original dtype
-            Gxx1 = Scale * np.multiply(np.conj(Xss), Xss)
-    
-            P[time_idx] = np.real(Gxx1)
-
+            Y = Scale * np.multiply(np.conj(Y), Y)    
+            P[time_idx] = np.real(Y)
             # update nstart to the next time step
             nstart = nstart + nx - noverlap
         else:
