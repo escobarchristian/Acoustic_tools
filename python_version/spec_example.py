@@ -44,7 +44,7 @@ def main():
     [P, F, T] = spectrogram.spectrogram_PSD_matlab(x,window,NOverlap,nfft,fs)
     spec = 10*np.log10(np.abs(P)) # In dB
     file_root = "chirp" 
-    folder_name='Out_spectrograms/'
+    folder_name='spectrogram_figs/'
     # Create output directory
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)

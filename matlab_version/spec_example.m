@@ -48,7 +48,7 @@ NOverlap = floor(NWindow*overlap); % Number of Overlap points
 spec=10*log10(P);
 
 file_root = 'chirp';
-folder_name='Out_spectrograms/';
+folder_name='spectrogram_figs/';
 % Create folder if it does not exist
 if ~exist(folder_name, 'dir')
     mkdir(folder_name)
